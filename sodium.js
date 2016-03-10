@@ -1,4 +1,4 @@
-var sodium = require('sodium').api
+var sodium = require('sodium-prebuilt').api
 var crypto = require('crypto')
 
 exports.KEY_LENGTH = 32
