@@ -17,3 +17,13 @@ tape('encrypts and decrypts', function (t) {
   t.same(encryption.decrypt(box, nonce, key), Buffer('hi'), 'same message out')
   t.end()
 })
+
+tape('scalar multiplication', function (t) {
+  var keys = encryption.scalarMultiplicationKeyPair()
+  var otherKeys = encryption.scalarMultiplicationKeyPair()
+  var sharedKey = encryption.scalarMultiplication(keys.secretKey, otherKeys.publicKey)
+  var otherSharedKey = encryption.scalarMultiplication(otherKeys.secretKey, keys.publicKey)
+
+  t.same(sharedKey, otherSharedKey, 'shared key should be the same')
+  t.end()
+})

@@ -42,6 +42,31 @@ Encrypts a message.
 
 Decrypt a message. Returns `null` is the message cannot be decrypted.
 
+#### `keys = encryption.scalarMultiplicationKeyPair([secretKey])`
+
+Generate a key pair to be used for scalar multiplication. If you don't pass in a secret key, one will be generated for you.
+Returns a key pair consisting of a secret key and a public key.
+
+``` js
+{
+  secretKey: <Buffer>,
+  publicKey: <Buffer>
+}
+```
+
+#### `sharedKey = encryption.scalarMultiplication(secretKey, otherPublicKey)`
+
+Generate a shared key based on a remote public scalar multiplication key and your own secret key.
+Returns the same shared key if called with corresponding secret and public key
+
+``` js
+var keys = encryption.scalarMultiplicationKeyPair()
+var otherKeys = encryption.scalarMultiplicationKeyPair()
+
+console.log('shared key', encryption.scalarMultiplication(keys.secretKey, otherKeys.publicKey))
+console.log('shared key', encryption.scalarMultiplication(otherKeys.secretKey, keys.publicKey))
+```
+
 ## License
 
 MIT
