@@ -25,6 +25,6 @@
   },
   "homepage": "https://github.com/mafintosh/sodium-encryption",
   "optionalDependencies": {
-    "sodium-prebuilt": "^1.0.22"
+    "sodium-prebuilt": "^1.1.15"
   }
 }
