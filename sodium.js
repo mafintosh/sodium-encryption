@@ -1,30 +1,44 @@
-var sodium = require('sodium-prebuilt').api
-var crypto = require('crypto')
+var sodium = require('sodium-native')
 
 exports.key = function () {
-  return crypto.randomBytes(32)
+  return randomBytes(sodium.crypto_secretbox_KEYBYTES)
 }
 
 exports.nonce = function () {
-  return crypto.randomBytes(24)
+  return randomBytes(sodium.crypto_secretbox_NONCEBYTES)
 }
 
 exports.encrypt = function (msg, nonce, key) {
-  return sodium.crypto_secretbox_easy(msg, nonce, key)
+  var cipher = new Buffer(msg.length + sodium.crypto_secretbox_MACBYTES)
+  sodium.crypto_secretbox_easy(cipher, msg, nonce, key)
+  return cipher
 }
 
-exports.decrypt = function (msg, nonce, key) {
-  return sodium.crypto_secretbox_open_easy(msg, nonce, key) || null
+exports.decrypt = function (cipher, nonce, key) {
+  if (cipher.length < sodium.crypto_secretbox_MACBYTES) return null
+  var msg = new Buffer(cipher.length - sodium.crypto_secretbox_MACBYTES)
+  if (!sodium.crypto_secretbox_open_easy(msg, cipher, nonce, key)) return null
+  return msg
 }
 
 exports.scalarMultiplication = function (secretKey, otherPublicKey) {
-  return sodium.crypto_scalarmult(secretKey, otherPublicKey)
+  var sharedSecret = new Buffer(sodium.crypto_scalarmult_BYTES)
+  sodium.crypto_scalarmult(sharedSecret, secretKey, otherPublicKey)
+  return sharedSecret
 }
 
 exports.scalarMultiplicationKeyPair = function (secretKey) {
-  if (!secretKey) secretKey = crypto.randomBytes(32)
+  if (!secretKey) secretKey = randomBytes(sodium.crypto_scalarmult_SCALARBYTES)
+  var publicKey = new Buffer(sodium.crypto_scalarmult_BYTES)
+  sodium.crypto_scalarmult_base(publicKey, secretKey)
   return {
     secretKey: secretKey,
-    publicKey: sodium.crypto_scalarmult_base(secretKey)
+    publicKey: publicKey
   }
+}
+
+function randomBytes (n) {
+  var buf = new Buffer(n)
+  sodium.randombytes_buf(buf)
+  return buf
 }
